@@ -10,15 +10,15 @@ import {
   loginUserSchema,
   updatePasswordSchema,
   updateUserSchema,
-} from "../schema/user.schema";
-import { validateBody } from "../middleware/validate.middleware";
-import { AuthService } from "../services/auth.service";
+} from "../../schema/user.schema";
+import { validateBody } from "../../middleware/validate.middleware";
+import { AuthService } from "../../services/auth.service";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from "../utils/jwt";
-import { requireAuth } from "../middleware/auth.middleware";
+} from "../../utils/jwt";
+import { requireAuth } from "../../middleware/auth.middleware";
 
 const authRoutes = express.Router();
 const authService = new AuthService();
@@ -32,7 +32,7 @@ const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
     secure: isProduction,
     sameSite: "strict",
     maxAge: COOKIE_MAX_AGE_MS,
-    path: "/api/auth",
+    path: "/api/v2/auth",
   });
 };
 
@@ -41,10 +41,43 @@ const clearRefreshTokenCookie = (res: Response) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: "strict",
-    path: "/api/auth",
+    path: "/api/v2/auth",
   });
 };
 
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - name
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: sokmeak@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *               name:
+ *                 type: string
+ *                 example: Sokmeak
+ *     responses:
+ *       201:
+ *         description: User registered and access token returned
+ *       409:
+ *         description: Email already exists
+ */
 authRoutes.post(
   "/register",
   validateBody(createUserSchema),
@@ -78,6 +111,35 @@ authRoutes.post(
   },
 );
 
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: Login a user
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: sokmeak@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: User logged in and access token returned
+ *       401:
+ *         description: Invalid email or password
+ */
 authRoutes.post(
   "/login",
   validateBody(loginUserSchema),
@@ -112,10 +174,55 @@ authRoutes.post(
   },
 );
 
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user
+ *       401:
+ *         description: Unauthorized
+ */
 authRoutes.get("/me", requireAuth, async (req: Request, res: Response) => {
   return res.json({ user: req.authUser });
 });
 
+/**
+ * @openapi
+ * /auth/me:
+ *   patch:
+ *     summary: Update current user profile
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: sokmeak.new@example.com
+ *               name:
+ *                 type: string
+ *                 example: Sokmeak New
+ *     responses:
+ *       200:
+ *         description: Profile updated and access token returned
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: Email already exists
+ */
 authRoutes.patch(
   "/me",
   requireAuth,
@@ -152,6 +259,39 @@ authRoutes.patch(
   },
 );
 
+/**
+ * @openapi
+ * /auth/me/password:
+ *   patch:
+ *     summary: Update current user password
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - current_password
+ *               - new_password
+ *             properties:
+ *               current_password:
+ *                 type: string
+ *                 example: password123
+ *               new_password:
+ *                 type: string
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password updated
+ *       400:
+ *         description: Current password is incorrect
+ *       401:
+ *         description: Unauthorized
+ */
 authRoutes.patch(
   "/me/password",
   requireAuth,
@@ -176,6 +316,21 @@ authRoutes.patch(
   },
 );
 
+/**
+ * @openapi
+ * /auth/refresh:
+ *   post:
+ *     summary: Rotate refresh token and return a new access token
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - refreshCookieAuth: []
+ *     responses:
+ *       200:
+ *         description: New access token returned
+ *       401:
+ *         description: Refresh token missing or invalid
+ */
 authRoutes.post("/refresh", async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
@@ -220,6 +375,19 @@ authRoutes.post("/refresh", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user and clear refresh token cookie
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - refreshCookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out
+ */
 authRoutes.post("/logout", async (req: Request, res: Response) => {
   const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
 

@@ -2,19 +2,50 @@ import { NextFunction } from "express";
 import express from "express";
 import { Request, Response } from "express";
 const taskRoutes = express.Router();
-import { TaskService } from "../services/task.service";
-import { requireAuth } from "../middleware/auth.middleware";
-import { ResponseStatus } from "../lib/ResponseStatus";
-import { validateBody } from "../middleware/validate.middleware";
+import { TaskService } from "../../services/task.service";
+import { requireAuth } from "../../middleware/auth.middleware";
+import { ResponseStatus } from "../../lib/ResponseStatus";
+import { validateBody } from "../../middleware/validate.middleware";
 import {
   createTaskSchema,
   reorderTasksSchema,
   updateTaskSchema,
-} from "../schema/task.schema";
+} from "../../schema/task.schema";
 const taskService = new TaskService();
-import { UpdateTaskDto } from "../schema/task.schema";
+import { UpdateTaskDto } from "../../schema/task.schema";
 
 // list all tasks that belongs to a given user id
+/**
+ * @openapi
+ * /tasks:
+ *   get:
+ *     summary: Get all tasks
+ *     tags:
+ *       - Tasks
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: current_page
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         example: 10
+ *       - in: query
+ *         name: category_id
+ *         schema:
+ *           type: string
+ *         example: uuid-value
+ *     responses:
+ *       200:
+ *         description: List of tasks
+ *       401:
+ *         description: Unauthorized
+ */
 taskRoutes.get(
   "/",
   requireAuth,
@@ -52,6 +83,45 @@ taskRoutes.get(
 
 // create a new task for a given user id
 
+/**
+ * @openapi
+ * /tasks:
+ *   post:
+ *     summary: Create a task
+ *     tags:
+ *       - Tasks
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - text
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 example: Buy groceries
+ *               category_id:
+ *                 type: string
+ *                 example: uuid-value
+ *               end_date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: 2026-05-01T10:00:00.000Z
+ *               order_number:
+ *                 type: integer
+ *                 example: 0
+ *     responses:
+ *       201:
+ *         description: Task created
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: Unauthorized
+ */
 taskRoutes.post(
   "/",
   requireAuth,
@@ -89,6 +159,39 @@ taskRoutes.post(
 );
 
 // Remove task
+/**
+ * @openapi
+ * /tasks/reorder:
+ *   post:
+ *     summary: Reorder tasks
+ *     tags:
+ *       - Tasks
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - task_ids
+ *             properties:
+ *               task_ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example:
+ *                   - uuid-value-1
+ *                   - uuid-value-2
+ *     responses:
+ *       200:
+ *         description: Tasks reordered
+ *       400:
+ *         description: Invalid task list
+ *       401:
+ *         description: Unauthorized
+ */
 taskRoutes.post(
   "/reorder",
   requireAuth,
@@ -120,6 +223,30 @@ taskRoutes.post(
 );
 
 // Remove task
+/**
+ * @openapi
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Delete a task
+ *     tags:
+ *       - Tasks
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: uuid-value
+ *     responses:
+ *       200:
+ *         description: Task deleted
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ */
 taskRoutes.delete("/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const user_id = req.authUser.id;
@@ -140,6 +267,57 @@ taskRoutes.delete("/:id", requireAuth, async (req: Request, res: Response) => {
 
 // update task
 
+/**
+ * @openapi
+ * /tasks/{id}:
+ *   patch:
+ *     summary: Update a task
+ *     tags:
+ *       - Tasks
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: uuid-value
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 example: Buy groceries and cook dinner
+ *               is_completed:
+ *                 type: boolean
+ *                 example: false
+ *               category_id:
+ *                 type: string
+ *                 nullable: true
+ *                 example: uuid-value
+ *               end_date:
+ *                 type: string
+ *                 format: date-time
+ *                 nullable: true
+ *                 example: 2026-05-01T10:00:00.000Z
+ *               order_number:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Task updated
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ */
 taskRoutes.patch(
   "/:id",
   requireAuth,

@@ -2,10 +2,13 @@ import express from "express";
 import { Request, Response } from "express";
 import { AppDataSource } from "./src/db/data-source";
 import cookieParser from "cookie-parser";
-import taskRoutes from "./src/routes/tasks";
-import authRoutes from "./src/routes/auth";
-import categoryRoutes from "./src/routes/category";
+import v1Routes from "./src/routes/v1";
+import v2Routes from "./src/routes/v2";
 import cors from "cors";
+
+import { swaggerV1Spec, swaggerV2Spec } from "./src/swagger";
+
+import swaggerUi from "swagger-ui-express";
 
 const app = express();
 
@@ -35,10 +38,18 @@ app.use(cookieParser());
 app.use(loggerMiddleware); // Apply the logger middleware globally
 
 // map the routes
-
-app.use("/api/tasks", taskRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/categories", categoryRoutes);
+app.use(
+  "/api-docs/v1",
+  swaggerUi.serveFiles(swaggerV1Spec),
+  swaggerUi.setup(swaggerV1Spec),
+);
+app.use(
+  "/api-docs/v2",
+  swaggerUi.serveFiles(swaggerV2Spec),
+  swaggerUi.setup(swaggerV2Spec),
+);
+app.use("/api/v1", v1Routes);
+app.use("/api/v2", v2Routes);
 
 // the entry point of the application!
 
