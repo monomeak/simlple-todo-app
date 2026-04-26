@@ -24,12 +24,12 @@ const createSwaggerSpec = (version: "v1" | "v2") => swaggerJsdoc({
           description:
             "HTTP-only refresh token cookie used only by /auth/refresh and /auth/logout.",
         },
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
+        accessCookieAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "access_token",
           description:
-            "Paste only the access_token value from login/register. Swagger UI will add the Bearer prefix.",
+            "HTTP-only access token cookie set by /auth/login, /auth/register, and /auth/refresh.",
         },
       },
       schemas: {

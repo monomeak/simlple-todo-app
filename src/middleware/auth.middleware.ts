@@ -15,6 +15,7 @@ declare global {
 
 
 const authService = new AuthService();
+const ACCESS_COOKIE_NAME = "access_token";
 
 export const requireAuth = async (
   req: Request,
@@ -23,12 +24,22 @@ export const requireAuth = async (
 ) => {
   try {
     const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies?.[ACCESS_COOKIE_NAME];
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if ((!authHeader || !authHeader.startsWith("Bearer ")) && !cookieToken) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const token = authHeader.slice("Bearer ".length).trim();
+    const token =
+      cookieToken ??
+      (authHeader?.startsWith("Bearer ")
+        ? authHeader.slice("Bearer ".length).trim()
+        : undefined);
+
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const payload = verifyAccessToken(token);
     const user = await authService.getUserById(payload.sub);
 

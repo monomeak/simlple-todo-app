@@ -22,7 +22,7 @@ const categoryService = new CategoryService();
  *     tags:
  *       - Categories
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: current_page
@@ -65,7 +65,7 @@ categoryRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
  *     tags:
  *       - Categories
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -123,7 +123,7 @@ categoryRoutes.post(
  *     tags:
  *       - Categories
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -188,7 +188,7 @@ categoryRoutes.patch(
  *     tags:
  *       - Categories
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

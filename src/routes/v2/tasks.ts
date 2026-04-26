@@ -23,7 +23,7 @@ import { UpdateTaskDto } from "../../schema/task.schema";
  *     tags:
  *       - Tasks
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: current_page
@@ -91,7 +91,7 @@ taskRoutes.get(
  *     tags:
  *       - Tasks
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -167,7 +167,7 @@ taskRoutes.post(
  *     tags:
  *       - Tasks
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -231,7 +231,7 @@ taskRoutes.post(
  *     tags:
  *       - Tasks
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -275,7 +275,7 @@ taskRoutes.delete("/:id", requireAuth, async (req: Request, res: Response) => {
  *     tags:
  *       - Tasks
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

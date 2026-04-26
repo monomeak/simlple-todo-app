@@ -59,5 +59,4 @@ export interface UserResponseDto {
 
 export interface AuthResponseDto {
   user: UserResponseDto;
-  access_token: string;
 }

@@ -17,25 +17,31 @@ const toHeaderCookie = () => {
 };
 
 const storeCookies = (response) => {
-  const setCookie = response.headers.get("set-cookie");
-  if (!setCookie) {
+  const setCookies =
+    typeof response.headers.getSetCookie === "function"
+      ? response.headers.getSetCookie()
+      : [response.headers.get("set-cookie")].filter(Boolean);
+
+  if (setCookies.length === 0) {
     return;
   }
 
-  const [cookiePart] = setCookie.split(";");
-  const separatorIndex = cookiePart.indexOf("=");
-  if (separatorIndex === -1) {
-    return;
+  for (const setCookie of setCookies) {
+    const [cookiePart] = setCookie.split(";");
+    const separatorIndex = cookiePart.indexOf("=");
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const name = cookiePart.slice(0, separatorIndex).trim();
+    const value = cookiePart.slice(separatorIndex + 1).trim();
+
+    if (!name || !value) {
+      continue;
+    }
+
+    cookieJar.set(name, value);
   }
-
-  const name = cookiePart.slice(0, separatorIndex).trim();
-  const value = cookiePart.slice(separatorIndex + 1).trim();
-
-  if (!name || !value) {
-    return;
-  }
-
-  cookieJar.set(name, value);
 };
 
 const request = async (path, options = {}) => {
@@ -82,17 +88,11 @@ const run = async () => {
     registerResult.response.status === 201,
     `Register failed: ${registerResult.response.status} ${JSON.stringify(registerResult.body)}`,
   );
-  assert(registerResult.body?.access_token, "Register missing access_token");
   assert(registerResult.body?.user?.email === email, "Register user payload mismatch");
+  assert(cookieJar.has("access_token"), "Register missing access_token cookie");
+  assert(cookieJar.has("refresh_token"), "Register missing refresh_token cookie");
 
-  const accessToken = registerResult.body.access_token;
-
-  const meResult = await request("/auth/me", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const meResult = await request("/auth/me", { method: "GET" });
 
   assert(
     meResult.response.status === 200,
@@ -107,7 +107,9 @@ const run = async () => {
     refreshResult.response.status === 200,
     `POST /auth/refresh failed: ${refreshResult.response.status} ${JSON.stringify(refreshResult.body)}`,
   );
-  assert(refreshResult.body?.access_token, "Refresh missing access_token");
+  assert(refreshResult.body?.success, "Refresh should return success");
+  assert(cookieJar.has("access_token"), "Refresh missing access_token cookie");
+  assert(cookieJar.has("refresh_token"), "Refresh missing refresh_token cookie");
 
   const logoutResult = await request("/auth/logout", {
     method: "POST",

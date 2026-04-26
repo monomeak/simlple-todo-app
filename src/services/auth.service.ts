@@ -94,7 +94,6 @@ export class AuthService {
     await this.userRepository.save(user);
     return this.toUserResponse(user);
   }
-
   async updateUserPassword(
     userId: string,
     updatePasswordDto: UpdatePasswordDto,

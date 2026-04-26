@@ -22,17 +22,38 @@ import { requireAuth } from "../../middleware/auth.middleware";
 
 const authRoutes = express.Router();
 const authService = new AuthService();
+const ACCESS_COOKIE_NAME = "access_token";
 const REFRESH_COOKIE_NAME = "refresh_token";
-const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const ACCESS_COOKIE_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
+const REFRESH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const isProduction = process.env.NODE_ENV === "production";
+
+const setAccessTokenCookie = (res: Response, accessToken: string) => {
+  res.cookie(ACCESS_COOKIE_NAME, accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "strict",
+    maxAge: ACCESS_COOKIE_MAX_AGE_MS,
+    path: "/",
+  });
+};
 
 const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
   res.cookie(REFRESH_COOKIE_NAME, refreshToken, {
     httpOnly: true,
     secure: isProduction,
     sameSite: "strict",
-    maxAge: COOKIE_MAX_AGE_MS,
+    maxAge: REFRESH_COOKIE_MAX_AGE_MS,
     path: "/api/v2/auth",
+  });
+};
+
+const clearAccessTokenCookie = (res: Response) => {
+  res.clearCookie(ACCESS_COOKIE_NAME, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "strict",
+    path: "/",
   });
 };
 
@@ -74,7 +95,7 @@ const clearRefreshTokenCookie = (res: Response) => {
  *                 example: Sokmeak
  *     responses:
  *       201:
- *         description: User registered and access token returned
+ *         description: User registered and auth cookies set
  *       409:
  *         description: Email already exists
  */
@@ -96,9 +117,10 @@ authRoutes.post(
         refreshTokenPayload.token,
         refreshTokenPayload.expiresAt,
       );
+      setAccessTokenCookie(res, access_token);
       setRefreshTokenCookie(res, refreshTokenPayload.token);
 
-      const response: AuthResponseDto = { user, access_token };
+      const response: AuthResponseDto = { user };
       return res.status(201).json(response);
     } catch (error: any) {
       if (error.message === "User with this email already exists") {
@@ -136,7 +158,7 @@ authRoutes.post(
  *                 example: password123
  *     responses:
  *       200:
- *         description: User logged in and access token returned
+ *         description: User logged in and auth cookies set
  *       401:
  *         description: Invalid email or password
  */
@@ -163,9 +185,10 @@ authRoutes.post(
         refreshTokenPayload.token,
         refreshTokenPayload.expiresAt,
       );
+      setAccessTokenCookie(res, access_token);
       setRefreshTokenCookie(res, refreshTokenPayload.token);
 
-      const response: AuthResponseDto = { user, access_token };
+      const response: AuthResponseDto = { user };
       return res.json(response);
     } catch (error) {
       console.error("Error logging in user:", error);
@@ -182,7 +205,7 @@ authRoutes.post(
  *     tags:
  *       - Auth
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     responses:
  *       200:
  *         description: Current user
@@ -201,7 +224,7 @@ authRoutes.get("/me", requireAuth, async (req: Request, res: Response) => {
  *     tags:
  *       - Auth
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -217,7 +240,7 @@ authRoutes.get("/me", requireAuth, async (req: Request, res: Response) => {
  *                 example: Sokmeak New
  *     responses:
  *       200:
- *         description: Profile updated and access token returned
+ *         description: Profile updated and auth cookie refreshed
  *       401:
  *         description: Unauthorized
  *       409:
@@ -238,10 +261,10 @@ authRoutes.patch(
         email: updatedUser.email,
         name: updatedUser.name,
       });
+      setAccessTokenCookie(res, access_token);
 
       const response: AuthResponseDto = {
         user: updatedUser,
-        access_token,
       };
 
       return res.json(response);
@@ -267,7 +290,7 @@ authRoutes.patch(
  *     tags:
  *       - Auth
  *     security:
- *       - bearerAuth: []
+ *       - accessCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -320,14 +343,14 @@ authRoutes.patch(
  * @openapi
  * /auth/refresh:
  *   post:
- *     summary: Rotate refresh token and return a new access token
+ *     summary: Rotate refresh token and set fresh auth cookies
  *     tags:
  *       - Auth
  *     security:
  *       - refreshCookieAuth: []
  *     responses:
  *       200:
- *         description: New access token returned
+ *         description: Auth cookies rotated
  *       401:
  *         description: Refresh token missing or invalid
  */
@@ -343,12 +366,14 @@ authRoutes.post("/refresh", async (req: Request, res: Response) => {
     const isValidToken = await authService.isRefreshTokenValid(refreshToken);
 
     if (!isValidToken) {
+      clearAccessTokenCookie(res);
       clearRefreshTokenCookie(res);
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
     const user = await authService.getUserById(payload.sub);
     if (!user) {
+      clearAccessTokenCookie(res);
       clearRefreshTokenCookie(res);
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -368,8 +393,11 @@ authRoutes.post("/refresh", async (req: Request, res: Response) => {
       name: user.name,
     });
 
-    return res.json({ access_token: accessToken });
+    setAccessTokenCookie(res, accessToken);
+
+    return res.json({ success: true });
   } catch (error) {
+    clearAccessTokenCookie(res);
     clearRefreshTokenCookie(res);
     return res.status(401).json({ error: "Invalid refresh token" });
   }
@@ -396,6 +424,7 @@ authRoutes.post("/logout", async (req: Request, res: Response) => {
   }
 
   clearRefreshTokenCookie(res);
+  clearAccessTokenCookie(res);
   return res.json({ success: true });
 });
 

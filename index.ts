@@ -15,7 +15,7 @@ const app = express();
 const parseAllowedOrigins = (): string[] => {
   const configuredOrigins = process.env.CORS_ORIGINS;
   if (!configuredOrigins) {
-    return ["http://localhost:8080"];
+    return ["http://localhost:4000"];
   }
 
   return configuredOrigins
