@@ -20,7 +20,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-white text-gray-900 transition-colors dark:bg-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-[var(--app-shell-bg)] text-[var(--app-text)] transition-colors">
       <HeaderClient />
 
       <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16">

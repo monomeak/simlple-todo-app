@@ -2,14 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckSquare,
-  Menu,
-  Moon,
-  Sun,
-  X,
-} from "lucide-react";
+import AppLogo from "./Logo";
+import { ArrowRight, CheckSquare, Menu, Moon, Sun, X } from "lucide-react";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -31,9 +25,7 @@ function getSystemTheme(): Theme {
 function getStoredTheme(): Theme | null {
   const storedTheme = localStorage.getItem("theme");
 
-  return storedTheme === "dark" || storedTheme === "light"
-    ? storedTheme
-    : null;
+  return storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
 }
 
 function getThemeSnapshot(): Theme {
@@ -104,20 +96,21 @@ export default function HeaderClient() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur-md dark:border-gray-700 dark:bg-gray-900/95">
+    <header className="sticky top-0 z-40 border-b border-[var(--app-sidebar-border)] bg-[var(--app-sidebar-bg)]/95 shadow-sm backdrop-blur-md">
       <nav
         aria-label="Primary"
         className="mx-auto grid w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6"
       >
-        <Link href="/" className="flex items-center gap-2 sm:gap-3">
+        {/* <Link href="/" className="flex items-center gap-2 sm:gap-3">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--app-sidebar-active)] text-[var(--app-sidebar-text)]">
             <CheckSquare className="h-5 w-5" />
           </span>
 
-          <span className="text-lg font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+          <span className="text-lg font-extrabold tracking-tight text-[var(--app-sidebar-text)]">
             MyTodo
           </span>
-        </Link>
+        </Link> */}
+        <AppLogo />
 
         <div className="hidden items-center justify-center gap-2 md:flex">
           {navItems.map((item) => (
@@ -125,7 +118,7 @@ export default function HeaderClient() {
               key={item.href}
               href={item.href}
               onClick={(event) => handleSmoothScroll(event, item.href)}
-              className="cursor-pointer rounded-full px-3 py-1.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-100 hover:text-[var(--app-accent)] dark:text-gray-300 dark:hover:bg-gray-800"
+              className="cursor-pointer rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--app-sidebar-text-soft)] transition hover:bg-[var(--app-sidebar-hover)] hover:text-[var(--app-accent)]"
             >
               {item.label}
             </a>
@@ -135,7 +128,7 @@ export default function HeaderClient() {
         <div className="hidden items-center gap-3 justify-self-end md:flex">
           <button
             onClick={toggleTheme}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="inline-flex items-center justify-center rounded-lg border border-[var(--app-sidebar-border)] bg-[var(--app-surface)] p-2 text-[var(--app-sidebar-text-soft)] transition hover:bg-[var(--app-sidebar-hover)]"
             aria-label="Toggle theme"
           >
             {isDarkMode ? (
@@ -146,17 +139,17 @@ export default function HeaderClient() {
           </button>
 
           <Link
-            href="/auth"
+            href="/login"
             className="inline-flex items-center gap-2 rounded-lg bg-[var(--app-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--app-accent-hover)]"
           >
-            Sign In
+            Login In
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         <button
           onClick={() => setIsNavOpen((prev) => !prev)}
-          className="inline-flex justify-self-end rounded-lg border border-gray-200 bg-white p-2 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 md:hidden"
+          className="inline-flex justify-self-end rounded-lg border border-[var(--app-sidebar-border)] bg-[var(--app-surface)] p-2 text-[var(--app-sidebar-text-soft)] md:hidden"
           aria-label="Toggle menu"
           aria-expanded={isNavOpen}
         >
@@ -165,14 +158,14 @@ export default function HeaderClient() {
       </nav>
 
       {isNavOpen && (
-        <div className="border-t border-gray-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900 md:hidden">
+        <div className="border-t border-[var(--app-sidebar-border)] bg-[var(--app-sidebar-bg)] px-4 py-4 md:hidden">
           <div className="flex flex-col gap-2.5">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={(event) => handleSmoothScroll(event, item.href)}
-                className="cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-[var(--app-accent)] dark:text-gray-300 dark:hover:bg-gray-800"
+                className="cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--app-sidebar-text-soft)] transition hover:bg-[var(--app-sidebar-hover)] hover:text-[var(--app-accent)]"
               >
                 {item.label}
               </a>
@@ -180,7 +173,7 @@ export default function HeaderClient() {
 
             <button
               onClick={toggleTheme}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--app-sidebar-border)] bg-[var(--app-surface)] px-3 py-2.5 text-sm font-medium text-[var(--app-sidebar-text-soft)] transition hover:bg-[var(--app-sidebar-hover)]"
             >
               {isDarkMode ? (
                 <>

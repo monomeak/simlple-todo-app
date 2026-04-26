@@ -37,7 +37,7 @@ export default function Features() {
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--app-accent)]">
               Features
             </p>
-            <h2 className="mt-1 text-2xl font-extrabold text-gray-900 dark:text-gray-100 sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-extrabold text-[var(--app-text)] sm:text-3xl">
               What You Can Do
             </h2>
           </div>
@@ -50,17 +50,17 @@ export default function Features() {
             return (
               <article
                 key={feature.title}
-                className="rounded-2xl border border-gray-200 bg-white p-6 transition hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-6 transition hover:shadow-lg"
               >
                 <div className="inline-flex rounded-lg bg-[var(--app-chip-bg)] p-2 text-[var(--app-accent)]">
                   <Icon className="h-5 w-5" />
                 </div>
 
-                <h3 className="mt-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="mt-3 text-lg font-semibold text-[var(--app-text)]">
                   {feature.title}
                 </h3>
 
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-1 text-sm text-[var(--app-text-muted)]">
                   {feature.description}
                 </p>
               </article>
@@ -71,13 +71,13 @@ export default function Features() {
 
       <section
         id="benefits"
-        className="scroll-mt-24 rounded-3xl border border-gray-200 bg-gray-50 p-7 dark:border-gray-700 dark:bg-gray-800 sm:p-9"
+        className="scroll-mt-24 rounded-3xl border border-[var(--app-border)] bg-[var(--app-surface)] p-7 sm:p-9"
       >
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--app-accent)]">
           Benefits
         </p>
 
-        <h2 className="mt-2 text-2xl font-extrabold text-gray-900 dark:text-gray-100 sm:text-3xl">
+        <h2 className="mt-2 text-2xl font-extrabold text-[var(--app-text)] sm:text-3xl">
           Why People Join MyTodo
         </h2>
 
@@ -85,10 +85,10 @@ export default function Features() {
           {benefits.map((benefit) => (
             <div
               key={benefit}
-              className="flex items-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-700/50"
+              className="flex items-start gap-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-task-card-bg)] px-4 py-3"
             >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--app-accent)]" />
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <p className="text-sm text-[var(--app-text)]">
                 {benefit}
               </p>
             </div>
@@ -100,28 +100,28 @@ export default function Features() {
         id="about"
         className="scroll-mt-24 grid gap-5 md:grid-cols-[1.2fr_0.8fr]"
       >
-        <div className="rounded-2xl border border-gray-200 bg-white p-7 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-7">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--app-accent)]">
             About Us
           </p>
 
-          <h2 className="mt-2 text-2xl font-extrabold text-gray-900 dark:text-gray-100">
+          <h2 className="mt-2 text-2xl font-extrabold text-[var(--app-text)]">
             Built for focused teams
           </h2>
 
-          <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--app-text-muted)]">
             We design practical software that helps people ship work every day.
             MyTodo is the starting point: fast setup, clear structure, and just
             enough features to stay productive.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-chip-bg)] p-7 dark:bg-gray-700/50">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-chip-bg)] p-7">
+          <h3 className="text-lg font-bold text-[var(--app-text)]">
             Ready to get started?
           </h3>
 
-          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+          <p className="mt-2 text-sm text-[var(--app-text)]">
             Create your account and begin planning your day in minutes.
           </p>
 

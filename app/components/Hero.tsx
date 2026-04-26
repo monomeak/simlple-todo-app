@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-8 dark:border-gray-700 dark:bg-gray-800 sm:p-12"
+      className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-[var(--app-border)] bg-[var(--app-surface)] p-8 sm:p-12"
     >
       <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-[var(--app-chip-bg)] opacity-70 blur-2xl" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-[var(--app-accent)]/15 opacity-70 blur-2xl" />
@@ -18,13 +18,13 @@ export default function Hero() {
             Minimal Task Platform
           </span>
 
-          <h1 className="mt-4 text-3xl font-extrabold leading-tight text-gray-900 dark:text-gray-100 sm:text-5xl">
+          <h1 className="mt-4 text-3xl font-extrabold leading-tight text-[var(--app-text)] sm:text-5xl">
             Keep work clear.
             <br />
             Finish what matters.
           </h1>
 
-          <p className="mt-4 max-w-2xl text-base text-gray-600 dark:text-gray-400 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-[var(--app-text-muted)] sm:text-lg">
             MyTodo is a minimalist task management app for personal focus. Plan
             tasks, organize categories, and move through your day with less
             noise and more action.
@@ -41,14 +41,14 @@ export default function Hero() {
 
             <a
               href="#features"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-3 text-sm font-semibold text-[var(--app-text)] transition hover:bg-[var(--app-chip-bg)]"
             >
               Explore Features
             </a>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-task-card-bg)] p-5 shadow-lg dark:bg-gray-700/50 sm:p-6">
+        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-task-card-bg)] p-5 shadow-lg sm:p-6">
           <div className="mb-4 flex items-center justify-between border-b border-[var(--app-border)] pb-4">
             <p className="text-sm font-semibold text-[var(--app-text)]">
               Today&apos;s Focus
