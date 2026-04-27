@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import AppLogo from "./Logo";
-import { ArrowRight, CheckSquare, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowRight, Menu, Moon, Sun, X } from "lucide-react";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -189,7 +189,7 @@ export default function HeaderClient() {
             </button>
 
             <Link
-              href="/auth"
+              href="/login"
               onClick={() => setIsNavOpen(false)}
               className="mt-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--app-accent)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[var(--app-accent-hover)]"
             >

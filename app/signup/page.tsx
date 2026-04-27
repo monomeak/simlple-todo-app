@@ -1,6 +1,7 @@
 import Link from "next/link";
-import AppLogo from "../components/Logo";
-import AuthForm from "../components/AuthForm";
+import AppLogo from "../components/landing/Logo";
+import AuthForm from "../components/auth/AuthForm";
+import SessionRefresh from "../components/auth/SessionRefresh";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
@@ -11,6 +12,7 @@ export const metadata = {
 export default function SignupPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-4 dark:bg-gray-900">
+      <SessionRefresh />
       <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="mb-6 flex justify-center">
           <AppLogo width={20} height={20} disableText={true} />

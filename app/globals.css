@@ -117,13 +117,13 @@
   }
 
   .dark {
-    --background: 210 15% 12%;
+    --background: 0 0% 12%;
     --foreground: 210 15% 92%;
 
-    --card: 210 15% 18%;
+    --card: 0 0% 15%;
     --card-foreground: 210 15% 92%;
 
-    --popover: 210 15% 18%;
+    --popover: 0 0% 15%;
     --popover-foreground: 210 15% 92%;
 
     --primary: 37 100% 50%;
@@ -132,7 +132,7 @@
     --secondary: 40 95% 60%;
     --secondary-foreground: 210 15% 12%;
 
-    --muted: 210 10% 30%;
+    --muted: 0 0% 20%;
     --muted-foreground: 210 10% 60%;
 
     --accent: 37 100% 50%;
@@ -141,8 +141,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 15% 25%;
-    --input: 210 10% 22%;
+    --border: 0 0% 22%;
+    --input: 0 0% 18%;
     --ring: 35 73% 41%;
 
     --sidebar-background: 240 5.9% 10%;
@@ -154,9 +154,9 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --app-shell-bg: #2b2412;
-    --app-surface: #3a3118;
-    --app-border: #6f5a1c;
+    --app-shell-bg: #1f1f1f;
+    --app-surface: #262626;
+    --app-border: #3a3a3a;
     --app-text: #f7edcf;
     --app-text-muted: #c7c1b2;
     --app-accent: #b58a04;
@@ -170,16 +170,16 @@
     --app-sidebar-text-soft: #dfdfdf;
     --app-sidebar-accent: #b58a04;
     --app-sidebar-danger-hover: #642a2a;
-    --app-task-card-bg: #332b16;
-    --app-task-card-border: #4d3f1b;
+    --app-task-card-bg: #262626;
+    --app-task-card-border: #3a3a3a;
     --app-task-text: #f7edcf;
     --app-task-text-done: #a79a73;
     --app-task-meta: #c7b98c;
-    --app-chip-bg: #473a1a;
+    --app-chip-bg: #303030;
     --app-chip-text: #ecd9a8;
-    --app-empty-bg: #3b3218;
+    --app-empty-bg: #2f2f2f;
     --app-empty-icon: #b29f6f;
-    --app-badge-due-bg: #57461f;
+    --app-badge-due-bg: #3a3428;
     --app-badge-due-text: #f0d290;
     --app-badge-overdue-bg: #5b2328;
     --app-badge-overdue-text: #ffc3c8;

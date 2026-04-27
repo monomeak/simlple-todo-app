@@ -1,8 +1,12 @@
-import Features from "./components/Features";
-import Footer from "./components/Footer";
-import HeaderClient from "./components/HeaderClient";
-import Hero from "./components/Hero";
+import { cookies } from "next/headers";
+import SessionRefresh from "./components/auth/SessionRefresh";
+import DashboardHome from "./components/dashboard/DashboardHome";
+import Features from "./components/landing/Features";
+import Footer from "./components/landing/Footer";
+import HeaderClient from "./components/landing/HeaderClient";
+import Hero from "./components/landing/Hero";
 
+const ACCESS_TOKEN_COOKIE = "access_token";
 
 export const metadata = {
   title: "MyTodo | Simple Task Management App for Daily Productivity",
@@ -18,9 +22,17 @@ export const metadata = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const isAuthenticated = Boolean(cookieStore.get(ACCESS_TOKEN_COOKIE)?.value);
+
+  if (isAuthenticated) {
+    return <DashboardHome />;
+  }
+
   return (
     <div className="min-h-screen bg-[var(--app-shell-bg)] text-[var(--app-text)] transition-colors">
+      <SessionRefresh />
       <HeaderClient />
 
       <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16">

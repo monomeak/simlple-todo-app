@@ -53,25 +53,24 @@ export default function Hero() {
             <p className="text-sm font-semibold text-[var(--app-text)]">
               Today&apos;s Focus
             </p>
-            <span className="rounded-full bg-[var(--app-chip-bg)] px-2 py-0.5 text-xs text-[var(--app-chip-text)]">
-              Live
-            </span>
           </div>
 
           <div className="space-y-3">
-            {["Plan sprint tasks", "Review overdue items", "Ship feature update"].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] px-3 py-2"
-                >
-                  <CheckCircle2 className="h-4 w-4 text-[var(--app-accent)]" />
-                  <span className="text-sm text-[var(--app-text-muted)]">
-                    {item}
-                  </span>
-                </div>
-              ),
-            )}
+            {[
+              "Plan sprint tasks",
+              "Review overdue items",
+              "Ship feature update",
+            ].map((item) => (
+              <div
+                key={item}
+                className="flex items-center gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] px-3 py-2"
+              >
+                <CheckCircle2 className="h-4 w-4 text-[var(--app-accent)]" />
+                <span className="text-sm text-[var(--app-text-muted)]">
+                  {item}
+                </span>
+              </div>
+            ))}
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-3">
