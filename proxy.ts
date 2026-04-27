@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAccessTokenActive } from "./app/lib/auth-token";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  const hasActiveAccessToken = isAccessTokenActive(token);
   const { pathname } = request.nextUrl;
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const isDashboardPath =
@@ -11,16 +13,13 @@ export function proxy(request: NextRequest) {
   const isCategoryPath = pathname.startsWith("/categories/");
   const isProtectedPath = isDashboardPath || isCategoryPath;
 
-  if (token && (isAuthPage || pathname === "/dashboard")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (hasActiveAccessToken && isAuthPage) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (!token && isProtectedPath) {
+  if (!hasActiveAccessToken && isProtectedPath) {
     const loginUrl = request.nextUrl.clone();
-    const callbackUrl =
-      pathname === "/dashboard"
-        ? `/${request.nextUrl.search}`
-        : `${pathname}${request.nextUrl.search}`;
+    const callbackUrl = `${pathname}${request.nextUrl.search}`;
 
     loginUrl.pathname = "/login";
     loginUrl.search = "";

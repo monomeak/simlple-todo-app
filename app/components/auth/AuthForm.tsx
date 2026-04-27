@@ -50,11 +50,12 @@ function getSafeCallbackUrl() {
       return DEFAULT_AUTH_REDIRECT;
     }
 
-    if (url.pathname === "/" || url.pathname === "/dashboard") {
+    if (url.pathname === "/") {
       return `${DEFAULT_AUTH_REDIRECT}${url.search}${url.hash}`;
     }
 
     const isAllowedAppPath =
+      url.pathname === "/dashboard" ||
       url.pathname.startsWith("/dashboard/") ||
       url.pathname.startsWith("/categories/");
 

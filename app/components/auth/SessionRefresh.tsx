@@ -13,11 +13,15 @@ function getSafeRedirect(redirectTo: string) {
       return "/";
     }
 
-    if (url.pathname === "/" || url.pathname === "/dashboard") {
+    if (url.pathname === "/") {
       return `/${url.search}${url.hash}`;
     }
 
-    if (url.pathname.startsWith("/dashboard/") || url.pathname.startsWith("/categories/")) {
+    if (
+      url.pathname === "/dashboard" ||
+      url.pathname.startsWith("/dashboard/") ||
+      url.pathname.startsWith("/categories/")
+    ) {
       return `${url.pathname}${url.search}${url.hash}`;
     }
   } catch {

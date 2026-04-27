@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import SessionRefresh from "./components/auth/SessionRefresh";
-import DashboardHome from "./components/dashboard/DashboardHome";
 import Features from "./components/landing/Features";
 import Footer from "./components/landing/Footer";
 import HeaderClient from "./components/landing/HeaderClient";
 import Hero from "./components/landing/Hero";
+import { isAccessTokenActive } from "./lib/auth-token";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
 
@@ -24,15 +25,15 @@ export const metadata = {
 
 export default async function Page() {
   const cookieStore = await cookies();
-  const isAuthenticated = Boolean(cookieStore.get(ACCESS_TOKEN_COOKIE)?.value);
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 
-  if (isAuthenticated) {
-    return <DashboardHome />;
+  if (isAccessTokenActive(accessToken)) {
+    redirect("/dashboard");
   }
 
   return (
     <div className="min-h-screen bg-[var(--app-shell-bg)] text-[var(--app-text)] transition-colors">
-      <SessionRefresh />
+      <SessionRefresh redirectTo="/dashboard" />
       <HeaderClient />
 
       <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16">

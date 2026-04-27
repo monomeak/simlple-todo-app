@@ -1,0 +1,241 @@
+Frontend Lesson Learnt - Next.js Todo App
+
+1. App Router structure
+
+- app/layout.tsx is the root layout shared by every route.
+- app/page.tsx handles the base URL "/".
+- app/login/page.tsx and app/signup/page.tsx are auth pages.
+- app/dashboard/(overview)/page.tsx is the dashboard page.
+- app/categories/[categoryId]/page.tsx is a dynamic category route.
+- Route groups like "(overview)" organize files without changing the URL.
+
+2. Server components vs client components
+
+- Pages are server components by default.
+- Server components can read cookies with next/headers.
+- Client components need "use client" at the top.
+- Client components can use hooks such as useState, useEffect, useRouter, and useSearchParams.
+- Keep browser-only logic in client components.
+- Keep routing decisions that depend on cookies in server components or proxy.ts.
+
+3. Base URL auth flow
+
+The base URL "/" is a decision route:
+
+GET /
+  - active access_token cookie -> redirect to /dashboard
+  - no access_token or expired access_token -> render landing page
+  - landing page runs SessionRefresh in the browser
+  - refresh success -> API sets new access_token -> redirect to /dashboard
+  - refresh fail -> stay on landing page
+
+The server cannot read refresh_token on "/" because refresh_token is scoped to /api/v*/auth.
+That is intentional and more secure.
+
+4. proxy.ts replaces middleware.ts
+
+Next.js 16 recommends proxy.ts instead of middleware.ts.
+
+Use proxy.ts for route protection:
+
+- If user has active access_token and visits /login or /signup, redirect to /dashboard.
+- If user does not have active access_token and visits protected routes, redirect to /login.
+- Protected routes include /dashboard and /categories/*.
+
+Do not redirect authenticated /dashboard back to "/".
+Dashboard should be the authenticated app surface.
+
+5. Cookie path decisions
+
+access_token:
+- path: "/"
+- needed by Next.js proxy and app/page.tsx
+- lets the frontend route layer know whether the user has an active session
+
+refresh_token:
+- path: "/api/v1/auth" or "/api/v2/auth"
+- only sent to refresh/logout auth endpoints
+- not visible to "/" or /dashboard
+- safer because fewer requests include the refresh token
+
+6. Access token expiry check
+
+We decode the JWT payload on the frontend route/proxy to check exp.
+This is not a trust/security validation.
+It is only a UX routing check.
+
+The backend remains the authority for real authentication.
+
+7. Refresh flow
+
+There are two refresh layers:
+
+- SessionRefresh component:
+  - runs on public pages
+  - calls /auth/refresh when access_token is missing
+  - if success, redirects to /dashboard
+
+- dashboard API client:
+  - if a protected API request returns 401
+  - calls /auth/refresh
+  - retries the original request if refresh succeeds
+
+Do not run refresh after intentional logout.
+Use a logged-out flag or disable SessionRefresh on /login?loggedOut=1.
+
+8. Logout behavior
+
+Logout should not retry refresh.
+
+dashboardApi.logout uses:
+retryOnUnauthorized: false
+
+After logout:
+- clear local dashboard state
+- redirect to /login?loggedOut=1
+- skip SessionRefresh once
+
+This prevents an unwanted /auth/refresh call after logout.
+
+9. Runtime environment loading
+
+Client components cannot safely read process.env directly at runtime.
+We expose runtime config through:
+
+GET /api/config
+
+The route returns:
+- API_URL
+- API_VERSION
+- APP_URL
+
+Then app/lib/runtime-config.ts provides:
+- getRuntimeConfig()
+- getApiUrl(path)
+- getVersionedApiUrl(path)
+
+Example:
+API_URL=http://localhost:3000
+API_VERSION=v2
+
+getVersionedApiUrl("/tasks")
+=> http://localhost:3000/api/v2/tasks
+
+10. API versioning
+
+Do not hardcode /api/v1 in every component.
+
+Use:
+getVersionedApiUrl("/auth/login")
+getVersionedApiUrl("/tasks")
+getVersionedApiUrl("/categories")
+
+Then switching API versions only requires changing:
+API_VERSION=v1
+or
+API_VERSION=v2
+
+11. Auth form UX
+
+Login/register uses:
+- credentials: "include"
+- API sets HttpOnly cookies
+- frontend does not store tokens in localStorage
+
+The form has states:
+- idle
+- submitting
+- redirecting
+
+A minimum loading time can make transitions smoother, but keep it small.
+The current implementation uses about 2 seconds for a smoother auth transition.
+
+12. Dashboard client data flow
+
+DashboardClient is a client component because it needs:
+- state
+- API requests
+- modals
+- task editing
+- category editing
+- router navigation
+- sidebar interactions
+
+The dashboard API client handles:
+- list tasks
+- create task
+- update task
+- delete task
+- reorder task
+- list categories
+- create category
+- update category
+- delete category
+- get current user
+- logout
+- update profile/password
+
+13. Category routes
+
+Use /categories/[categoryId] for category pages.
+
+Old /dashboard/categories/[categoryId] redirects to /categories/[categoryId].
+This keeps backward compatibility while making URLs cleaner.
+
+14. Server/client Suspense rule
+
+useSearchParams() in a client component may require a Suspense boundary in Next.js.
+
+DashboardHome wraps DashboardClient in Suspense to avoid build errors.
+
+15. Styling strategy
+
+globals.css has two token layers:
+
+Generic tokens:
+- --background
+- --foreground
+- --card
+- --border
+
+App-specific tokens:
+- --app-shell-bg
+- --app-surface
+- --app-sidebar-bg
+- --app-task-card-bg
+- --app-text
+- --app-border
+
+Generic tokens support Tailwind theme classes like bg-background.
+App tokens describe the Todo app UI directly.
+
+16. Mobile menu lessons
+
+Mobile sidebar should:
+- lock body scroll while open
+- close on Escape
+- close when selecting a nav item
+- use an overlay behind the drawer
+- avoid relying only on hover-only actions
+
+Desktop sidebar can support collapse/expand.
+Mobile sidebar should behave like a drawer.
+
+17. Common mistakes avoided
+
+- Do not store access tokens in localStorage for this Next version.
+- Do not hardcode /api/v1 in many places.
+- Do not let logout trigger refresh.
+- Do not make "/" protected if it must also render landing.
+- Do not read refresh_token from server routes where cookie path prevents it.
+- Do not use middleware.ts in Next 16 when proxy.ts is recommended.
+- Do not use client hooks in server components.
+
+18. Mental model
+
+Backend owns authentication.
+Cookies carry authentication.
+proxy.ts protects routes.
+app/page.tsx decides landing vs redirect.
+SessionRefresh silently restores expired sessions.
+DashboardClient owns interactive app behavior.
