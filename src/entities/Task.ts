@@ -24,6 +24,8 @@ export class Task {
   @Column()
   text: string;
 
+  @Column({ nullable: true })
+  description: string;
   @Column({ default: false })
   is_completed: boolean;
 

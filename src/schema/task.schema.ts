@@ -17,6 +17,11 @@ export const createTaskSchema = z.object({
     .string()
     .min(1, "Task text cannot be empty")
     .max(100, "Task text must be less than 100   characters"),
+  description: z
+    .string()
+    .min(1, "Task text cannot be empty")
+    .max(100, "Task text must be less than 400 characters")
+    .optional(),
   category_id: z.string().optional(),
   end_date: endDateSchema.optional().nullable(),
   order_number: z.number().int().nonnegative().optional(),
@@ -27,6 +32,11 @@ export const updateTaskSchema = z.object({
     .string()
     .min(1, "Task text cannot be empty")
     .max(100, "Task text must be less than 100 characters")
+    .optional(),
+  description: z
+    .string()
+    .min(1, "Task text cannot be empty")
+    .max(100, "Task text must be less than 400 characters")
     .optional(),
   is_completed: z.boolean().optional(),
   category_id: z.string().nullable().optional(),
@@ -46,6 +56,7 @@ export interface TaskResponseDto {
   user_id: string;
   category_id: string | null;
   text: string;
+  description: string;
   is_completed: boolean;
   completed_at: Date | null;
   end_date: Date | null;

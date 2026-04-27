@@ -175,6 +175,7 @@ export class TaskService {
       user_id: task.user_id,
       category_id: task.category_id || null,
       text: task.text,
+      description: task.description,
       is_completed: task.is_completed,
       completed_at: task.completed_at,
       end_date: task.end_date,
