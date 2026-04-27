@@ -4,7 +4,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getApiUrl } from "../../lib/runtime-config";
+import { getVersionedApiUrl } from "../../lib/runtime-config";
 
 type AuthMode = "signup" | "login";
 interface AuthFormProps {
@@ -17,6 +17,7 @@ type AuthErrorResponse = {
 };
 
 const DEFAULT_AUTH_REDIRECT = "/";
+const MIN_AUTH_LOADING_MS = 1000;
 type SubmitState = "idle" | "submitting" | "redirecting";
 
 async function getAuthErrorMessage(response: Response) {
@@ -27,6 +28,10 @@ async function getAuthErrorMessage(response: Response) {
   } catch {
     return "Authentication failed";
   }
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function getSafeCallbackUrl() {
@@ -96,8 +101,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
     try {
       setSubmitState("submitting");
-      const endpoint = await getApiUrl(
-        isSignUp ? "/api/v1/auth/register" : "/api/v1/auth/login",
+      const startedAt = performance.now();
+      const endpoint = await getVersionedApiUrl(
+        isSignUp ? "/auth/register" : "/auth/login",
       );
       const response = await fetch(endpoint, {
         method: "POST",
@@ -111,6 +117,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
         }),
         credentials: "include",
       });
+      const elapsed = performance.now() - startedAt;
+      if (elapsed < MIN_AUTH_LOADING_MS) {
+        await wait(MIN_AUTH_LOADING_MS - elapsed);
+      }
 
       if (!response.ok) {
         setLocalError(await getAuthErrorMessage(response));
@@ -143,22 +153,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
         className="relative space-y-4"
         aria-busy={isBusy}
       >
-        {submitState === "redirecting" && (
-          <div className="absolute inset-0 z-10 grid place-items-center rounded-xl bg-[var(--app-surface)]/90 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3 text-center">
-              <Loader2 className="h-6 w-6 animate-spin text-[var(--app-accent)]" />
-              <div>
-                <p className="text-sm font-semibold text-[var(--app-text)]">
-                  Preparing your dashboard
-                </p>
-                <p className="text-xs text-[var(--app-text-muted)]">
-                  Your session is ready.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* allow full name visible for signup */}
         {isSignUp && (
           <FloatingInput

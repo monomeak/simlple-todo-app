@@ -1,4 +1,4 @@
-import { getApiUrl } from "../runtime-config";
+import { getVersionedApiUrl } from "../runtime-config";
 import type {
   Category,
   CategoryItemResponse,
@@ -38,7 +38,7 @@ async function parseApiError(response: Response) {
 }
 
 async function requestOnce(path: string, options: RequestInit = {}) {
-  const url = await getApiUrl(`/api/v1${path}`);
+  const url = await getVersionedApiUrl(path);
 
   return fetch(url, {
     ...options,
@@ -83,7 +83,11 @@ export async function apiRequest<T>(
 
 export const dashboardApi = {
   getCurrentUser: () => apiRequest<{ user: User }>("/auth/me"),
-  logout: () => apiRequest<{ success: boolean }>("/auth/logout", { method: "POST" }),
+  logout: () =>
+    apiRequest<{ success: boolean }>("/auth/logout", {
+      method: "POST",
+      retryOnUnauthorized: false,
+    }),
   updateProfile: (payload: { name?: string; email?: string }) =>
     apiRequest<{ user: User }>("/auth/me", {
       method: "PATCH",

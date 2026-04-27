@@ -11,6 +11,7 @@ export const metadata = {
 type LoginPageProps = {
   searchParams?: Promise<{
     callbackUrl?: string | string[];
+    loggedOut?: string | string[];
   }>;
 };
 
@@ -19,10 +20,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const callbackUrl = Array.isArray(params?.callbackUrl)
     ? params.callbackUrl[0]
     : params?.callbackUrl;
+  const loggedOut = Array.isArray(params?.loggedOut)
+    ? params.loggedOut[0]
+    : params?.loggedOut;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-4 dark:bg-gray-900">
-      <SessionRefresh redirectTo={callbackUrl ?? "/"} />
+      <SessionRefresh redirectTo={callbackUrl ?? "/"} disabled={loggedOut === "1"} />
       <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="mb-6 flex justify-center">
           <AppLogo width={20} height={20} disableText={true} />

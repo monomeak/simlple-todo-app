@@ -427,8 +427,8 @@ export default function DashboardClient({
       setTasks([]);
       setCategories([]);
       setIsLogoutConfirmOpen(false);
-      router.replace("/login");
-      router.refresh();
+      sessionStorage.setItem("auth_just_logged_out", "true");
+      window.location.replace("/login?loggedOut=1");
     } finally {
       setIsLoggingOut(false);
     }

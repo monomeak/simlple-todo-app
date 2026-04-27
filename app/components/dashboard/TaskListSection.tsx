@@ -116,6 +116,7 @@ export default function TaskListSection({
           ? "No to-do tasks"
           : "No tasks yet";
 
+          // Handle empty task list
     return (
       <div className="max-w-[980px] rounded-xl border border-[var(--app-task-card-border)] bg-[var(--app-task-card-bg)] px-4 py-5 shadow-sm">
         <div className="flex items-start gap-3">
@@ -286,8 +287,7 @@ export default function TaskListSection({
                       onClick={() => startEdit(task)}
                       className={cn(
                         "rounded px-1 -mx-1",
-                        !task.is_completed &&
-                          "cursor-text transition hover:bg-[var(--app-chip-bg)]",
+                        !task.is_completed && "cursor-text",
                       )}
                     >
                       <p

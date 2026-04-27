@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { getApiUrl } from "../../lib/runtime-config";
+import { getVersionedApiUrl } from "../../lib/runtime-config";
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -17,7 +17,7 @@ function getSafeRedirect(redirectTo: string) {
       return `/${url.search}${url.hash}`;
     }
 
-    if (url.pathname.startsWith("/dashboard/")) {
+    if (url.pathname.startsWith("/dashboard/") || url.pathname.startsWith("/categories/")) {
       return `${url.pathname}${url.search}${url.hash}`;
     }
   } catch {
@@ -28,7 +28,7 @@ function getSafeRedirect(redirectTo: string) {
 
 function refreshSession() {
   refreshPromise ??= (async () => {
-    const endpoint = await getApiUrl("/api/v1/auth/refresh");
+    const endpoint = await getVersionedApiUrl("/auth/refresh");
     const response = await fetch(endpoint, {
       method: "POST",
       credentials: "include",
@@ -40,8 +40,27 @@ function refreshSession() {
   return refreshPromise;
 }
 
-export default function SessionRefresh({ redirectTo = "/" }: { redirectTo?: string }) {
+function shouldSkipSessionRefresh() {
+  if (sessionStorage.getItem("auth_just_logged_out") !== "true") {
+    return false;
+  }
+
+  sessionStorage.removeItem("auth_just_logged_out");
+  return true;
+}
+
+export default function SessionRefresh({
+  redirectTo = "/",
+  disabled = false,
+}: {
+  redirectTo?: string;
+  disabled?: boolean;
+}) {
   useEffect(() => {
+    if (disabled || shouldSkipSessionRefresh()) {
+      return;
+    }
+
     let isActive = true;
 
     refreshSession().then((isRefreshed) => {
@@ -55,7 +74,7 @@ export default function SessionRefresh({ redirectTo = "/" }: { redirectTo?: stri
     return () => {
       isActive = false;
     };
-  }, [redirectTo]);
+  }, [disabled, redirectTo]);
 
   return null;
 }

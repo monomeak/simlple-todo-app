@@ -1,6 +1,7 @@
 // src/lib/runtime-config.ts
 export type RuntimeConfig = {
   apiUrl: string;
+  apiVersion: string;
   appUrl: string;
 };
 
@@ -28,4 +29,12 @@ export async function getApiUrl(path: string): Promise<string> {
   }
 
   return new URL(path, apiUrl).toString();
+}
+
+export async function getVersionedApiUrl(path: string): Promise<string> {
+  const { apiVersion } = await getRuntimeConfig();
+  const normalizedVersion = apiVersion.trim().replace(/^\/+|\/+$/g, "") || "v1";
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return getApiUrl(`/api/${normalizedVersion}${normalizedPath}`);
 }
