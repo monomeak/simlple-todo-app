@@ -130,7 +130,9 @@ export default function DashboardClient({
 
   useEffect(() => {
     if (selectedCategoryId && !isCategoriesLoading && !selectedCategory) {
-      router.replace(selectedView === "all" ? "/" : `/?view=${selectedView}`);
+      router.replace(
+        selectedView === "all" ? "/dashboard" : `/dashboard?view=${selectedView}`,
+      );
     }
   }, [
     selectedCategoryId,
@@ -409,7 +411,7 @@ export default function DashboardClient({
     try {
       await dashboardApi.deleteCategory(category.id);
       setCategories((prev) => prev.filter((item) => item.id !== category.id));
-      if (selectedCategoryId === category.id) router.push("/");
+      if (selectedCategoryId === category.id) router.push("/dashboard");
     } catch (categoryError) {
       setError(
         categoryError instanceof Error ? categoryError.message : "Failed to delete category.",
@@ -448,7 +450,7 @@ export default function DashboardClient({
 
   const focusNewTask = () => {
     if (selectedCategoryId || selectedView !== "all") {
-      router.push("/");
+      router.push("/dashboard");
       setTimeout(() => {
         document.querySelector<HTMLInputElement>('[data-testid="task-input"]')?.focus();
       }, 80);
@@ -536,15 +538,15 @@ export default function DashboardClient({
             onDeleteCategory={deleteCategory}
             onSelectAllTasks={() => {
               closeSidebar();
-              navigateTo("/");
+              navigateTo("/dashboard");
             }}
             onSelectTodoTasks={() => {
               closeSidebar();
-              navigateTo("/?view=todo");
+              navigateTo("/dashboard?view=todo");
             }}
             onSelectOverdueTasks={() => {
               closeSidebar();
-              navigateTo("/?view=overdue");
+              navigateTo("/dashboard?view=overdue");
             }}
             onSelectCategory={(id) => {
               closeSidebar();
