@@ -4,7 +4,7 @@
 #   docker build -f apps/web/Dockerfile .
 # (docker-compose.yml is already set up this way.)
 
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 RUN corepack enable
 
 # ---- 1. Prune the workspace down to only what the web app needs ----

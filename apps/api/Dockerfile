@@ -4,7 +4,7 @@
 #   docker build -f apps/api/Dockerfile .
 # (docker-compose.yml is already set up this way.)
 
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 RUN corepack enable
 ENV CI=true
 
