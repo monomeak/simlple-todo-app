@@ -1,10 +1,12 @@
 {
-  "name": "expressjs",
+  "name": "todoapi",
   "version": "0.0.0",
   "private": true,
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
     "test:auth": "node scripts/test-auth.mjs"
   },
   "dependencies": {
