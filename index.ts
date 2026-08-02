@@ -15,7 +15,7 @@ const app = express();
 const parseAllowedOrigins = (): string[] => {
   const configuredOrigins = process.env.CORS_ORIGINS;
   if (!configuredOrigins) {
-    return ["http://localhost:4000"];
+    return ["http://localhost:8080"];
   }
 
   return configuredOrigins
@@ -81,7 +81,7 @@ const startServer = async () => {
 // setup global middleware that act as logger for all routes
 
 function loggerMiddleware(req: Request, res: Response, next: Function) {
-  console.log(`${req.method} ${req.originalUrl}`);
+  console.log(`${req.method} ${req.originalUrl} ${res.statusCode}`);
   next();
 }
 

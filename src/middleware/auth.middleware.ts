@@ -3,7 +3,6 @@ import { AuthService } from "../services/auth.service";
 import { AccessTokenPayload, verifyAccessToken } from "../utils/jwt";
 import { UserResponseDto } from "../schema/user.schema";
 
-
 declare global {
   namespace Express {
     interface Request {
@@ -12,7 +11,6 @@ declare global {
     }
   }
 }
-
 
 const authService = new AuthService();
 const ACCESS_COOKIE_NAME = "access_token";
@@ -23,18 +21,14 @@ export const requireAuth = async (
   next: NextFunction,
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    // const authHeader = req.headers.authorization;
     const cookieToken = req.cookies?.[ACCESS_COOKIE_NAME];
 
-    if ((!authHeader || !authHeader.startsWith("Bearer ")) && !cookieToken) {
+    if (!cookieToken) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const token =
-      cookieToken ??
-      (authHeader?.startsWith("Bearer ")
-        ? authHeader.slice("Bearer ".length).trim()
-        : undefined);
+    const token = cookieToken ?? null; // fallback to null
 
     if (!token) {
       return res.status(401).json({ error: "Unauthorized" });
